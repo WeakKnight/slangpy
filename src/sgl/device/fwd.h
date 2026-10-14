@@ -107,6 +107,8 @@ struct ComputePipelineDesc;
 class ComputePipeline;
 struct RenderPipelineDesc;
 class RenderPipeline;
+struct TilePipelineDesc;
+class TilePipeline;
 struct RayTracingPipelineDesc;
 class RayTracingPipeline;
 

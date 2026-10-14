@@ -134,6 +134,7 @@ enum class TextureUsage : uint32_t {
     resolve_destination = static_cast<uint32_t>(rhi::TextureUsage::ResolveDestination),
     typeless = static_cast<uint32_t>(rhi::TextureUsage::Typeless),
     shared = static_cast<uint32_t>(rhi::TextureUsage::Shared),
+    transient_attachment = static_cast<uint32_t>(rhi::TextureUsage::TransientAttachment),
 };
 SGL_ENUM_CLASS_OPERATORS(TextureUsage);
 
@@ -152,6 +153,7 @@ SGL_ENUM_FLAGS_INFO(
         {TextureUsage::resolve_destination, "resolve_destination"},
         {TextureUsage::typeless, "typeless"},
         {TextureUsage::shared, "shared"},
+        {TextureUsage::transient_attachment, "transient_attachment"},
     }
 );
 SGL_ENUM_REGISTER(TextureUsage);

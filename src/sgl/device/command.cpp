@@ -140,6 +140,25 @@ void RenderPassEncoder::bind_pipeline(RenderPipeline* pipeline, ShaderObject* ro
     m_rhi_render_pass_encoder->bindPipeline(pipeline->rhi_pipeline(), root_object->rhi_shader_object());
 }
 
+ShaderObject* RenderPassEncoder::bind_pipeline(TilePipeline* pipeline)
+{
+    SGL_CHECK_NOT_NULL(pipeline);
+
+    rhi::IShaderObject* rhi_root_object = m_rhi_render_pass_encoder->bindPipeline(pipeline->rhi_pipeline());
+    ShaderObject* root_object = m_command_encoder->_get_root_object(rhi_root_object);
+    if (m_command_encoder->device()->debug_printer())
+        m_command_encoder->device()->debug_printer()->bind(ShaderCursor(root_object));
+    return root_object;
+}
+
+void RenderPassEncoder::bind_pipeline(TilePipeline* pipeline, ShaderObject* root_object)
+{
+    SGL_CHECK_NOT_NULL(pipeline);
+    SGL_CHECK_NOT_NULL(root_object);
+
+    m_rhi_render_pass_encoder->bindPipeline(pipeline->rhi_pipeline(), root_object->rhi_shader_object());
+}
+
 void RenderPassEncoder::set_render_state(const RenderState& state)
 {
     rhi::RenderState rhi_state = {};
@@ -191,6 +210,11 @@ void RenderPassEncoder::draw_indexed_indirect(
 void RenderPassEncoder::draw_mesh_tasks(uint3 dimensions)
 {
     m_rhi_render_pass_encoder->drawMeshTasks(dimensions.x, dimensions.y, dimensions.z);
+}
+
+void RenderPassEncoder::dispatch_tile()
+{
+    m_rhi_render_pass_encoder->dispatchTile();
 }
 
 void RenderPassEncoder::end()
@@ -320,6 +344,10 @@ ref<RenderPassEncoder> CommandEncoder::begin_render_pass(const RenderPassDesc& d
     SGL_CHECK(m_open, "Command encoder is finished");
 
     rhi::RenderPassDesc rhi_desc = {};
+    rhi_desc.tileWidth = desc.tile_width;
+    rhi_desc.tileHeight = desc.tile_height;
+    rhi_desc.tileMemorySizes = desc.tile_memory_sizes.data();
+    rhi_desc.tileMemoryCount = narrow_cast<uint32_t>(desc.tile_memory_sizes.size());
 
     short_vector<rhi::RenderPassColorAttachment, 16> rhi_color_attachments;
     for (const auto& ca : desc.color_attachments) {
@@ -357,6 +385,7 @@ ref<RenderPassEncoder> CommandEncoder::begin_render_pass(const RenderPassDesc& d
 
     m_render_pass_encoder->m_command_encoder = this;
     m_render_pass_encoder->m_rhi_render_pass_encoder = m_rhi_command_encoder->beginRenderPass(rhi_desc);
+    SGL_CHECK(m_render_pass_encoder->m_rhi_render_pass_encoder, "Failed to begin render pass");
     m_render_pass_encoder->m_rhi_pass_encoder = m_render_pass_encoder->m_rhi_render_pass_encoder;
     return m_render_pass_encoder;
 }

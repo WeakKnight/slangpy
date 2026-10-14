@@ -3481,6 +3481,8 @@ static const char *mkd_doc_sgl_Device_create_texture_from_resource = R"doc(Creat
 
 static const char *mkd_doc_sgl_Device_create_texture_view = R"doc(Create a new texture view.)doc";
 
+static const char *mkd_doc_sgl_Device_create_tile_pipeline = R"doc(Create a tile pipeline. Requires ``Feature::tile_shading``.)doc";
+
 static const char *mkd_doc_sgl_Device_cuda_device = R"doc()doc";
 
 static const char *mkd_doc_sgl_Device_debug_logger = R"doc()doc";
@@ -4137,6 +4139,8 @@ static const char *mkd_doc_sgl_Feature_sm_6_9 = R"doc()doc";
 static const char *mkd_doc_sgl_Feature_software_device = R"doc()doc";
 
 static const char *mkd_doc_sgl_Feature_surface = R"doc()doc";
+
+static const char *mkd_doc_sgl_Feature_tile_shading = R"doc()doc";
 
 static const char *mkd_doc_sgl_Feature_timestamp_calibration = R"doc()doc";
 
@@ -7876,13 +7880,42 @@ static const char *mkd_doc_sgl_RenderPassDesc_color_attachments = R"doc()doc";
 
 static const char *mkd_doc_sgl_RenderPassDesc_depth_stencil_attachment = R"doc()doc";
 
+static const char *mkd_doc_sgl_RenderPassDesc_tile_height =
+R"doc(Tile height in pixels, or 0 to let the backend choose. Requires
+``Feature::tile_shading`` if nonzero.)doc";
+
+static const char *mkd_doc_sgl_RenderPassDesc_tile_memory_sizes =
+R"doc(Sizes in bytes of the tile memory slots, indexed by the ``N`` of the
+shader's ``SV_MetalThreadgroupN`` semantic. Each size must be a
+multiple of 16. Requires ``Feature::tile_shading``.)doc";
+
+static const char *mkd_doc_sgl_RenderPassDesc_tile_width =
+R"doc(Tile width in pixels, or 0 to let the backend choose. Requires
+``Feature::tile_shading`` if nonzero.)doc";
+
 static const char *mkd_doc_sgl_RenderPassEncoder = R"doc()doc";
 
 static const char *mkd_doc_sgl_RenderPassEncoder_bind_pipeline = R"doc()doc";
 
 static const char *mkd_doc_sgl_RenderPassEncoder_bind_pipeline_2 = R"doc()doc";
 
+static const char *mkd_doc_sgl_RenderPassEncoder_bind_pipeline_3 =
+R"doc(Bind a tile pipeline for subsequent ``dispatch_tile`` calls and return
+its root object. The tile pipeline is bound independently of the
+render pipeline used by draws.
+
+)doc";
+
+static const char *mkd_doc_sgl_RenderPassEncoder_bind_pipeline_4 = R"doc()doc";
+
 static const char *mkd_doc_sgl_RenderPassEncoder_class_name = R"doc()doc";
+
+static const char *mkd_doc_sgl_RenderPassEncoder_dispatch_tile =
+R"doc(Dispatch the bound tile pipeline once on every tile of the render
+pass, with one thread group of the entry point's ``numthreads`` size
+per tile.
+
+)doc";
 
 static const char *mkd_doc_sgl_RenderPassEncoder_draw = R"doc()doc";
 
@@ -8624,6 +8657,8 @@ static const char *mkd_doc_sgl_ShaderStage_miss = R"doc()doc";
 static const char *mkd_doc_sgl_ShaderStage_none = R"doc()doc";
 
 static const char *mkd_doc_sgl_ShaderStage_ray_generation = R"doc()doc";
+
+static const char *mkd_doc_sgl_ShaderStage_tile = R"doc()doc";
 
 static const char *mkd_doc_sgl_ShaderStage_vertex = R"doc()doc";
 
@@ -9677,6 +9712,8 @@ static const char *mkd_doc_sgl_TextureUsage_shader_resource = R"doc()doc";
 
 static const char *mkd_doc_sgl_TextureUsage_shared = R"doc()doc";
 
+static const char *mkd_doc_sgl_TextureUsage_transient_attachment = R"doc()doc";
+
 static const char *mkd_doc_sgl_TextureUsage_typeless = R"doc()doc";
 
 static const char *mkd_doc_sgl_TextureUsage_unordered_access = R"doc()doc";
@@ -9841,6 +9878,50 @@ static const char *mkd_doc_sgl_Texture_width = R"doc()doc";
 static const char *mkd_doc_sgl_Texture_write_slangpy_signature = R"doc(Write the SlangPy cache signature used by functional dispatch.)doc";
 
 static const char *mkd_doc_sgl_Texture_write_to_cursor = R"doc(Bind a nullable texture value to a shader cursor.)doc";
+
+static const char *mkd_doc_sgl_TilePipeline =
+R"doc(Tile pipeline. Runs a tile shader entry point on every tile of a
+render pass, between draws. Requires ``Feature::tile_shading``.)doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc_color_formats =
+R"doc(Formats of the render pass color attachments the pipeline is used
+with.)doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc_compilation_policy = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc_label = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc_program = R"doc(Program with exactly one tile entry point.)doc";
+
+static const char *mkd_doc_sgl_TilePipelineDesc_sample_count = R"doc(Sample count of the render pass attachments the pipeline is used with.)doc";
+
+static const char *mkd_doc_sgl_TilePipeline_TilePipeline = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_desc = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_m_desc = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_m_rhi_pipeline = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_m_thread_group_size = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_native_handle = R"doc(Get the native pipeline handle.)doc";
+
+static const char *mkd_doc_sgl_TilePipeline_recreate = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_release_rhi_resources = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_rhi_pipeline = R"doc()doc";
+
+static const char *mkd_doc_sgl_TilePipeline_thread_group_size =
+R"doc(Thread group size. One thread group of this size is dispatched per
+tile.
+
+)doc";
+
+static const char *mkd_doc_sgl_TilePipeline_to_string = R"doc()doc";
 
 static const char *mkd_doc_sgl_Timer = R"doc(High resolution CPU timer.)doc";
 

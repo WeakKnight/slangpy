@@ -201,6 +201,60 @@ std::string RenderPipeline::to_string() const
 }
 
 // ----------------------------------------------------------------------------
+// TilePipeline
+// ----------------------------------------------------------------------------
+
+TilePipeline::TilePipeline(ref<Device> device, TilePipelineDesc desc)
+    : Pipeline(std::move(device), desc.program)
+    , m_desc(std::move(desc))
+{
+    recreate();
+}
+
+void TilePipeline::recreate()
+{
+    std::vector<rhi::Format> formats;
+    for (auto format : m_desc.color_formats)
+        formats.push_back(static_cast<rhi::Format>(format));
+    rhi::TilePipelineDesc rhi_desc{
+        .program = m_desc.program->rhi_shader_program(),
+        .colorFormats = formats.data(),
+        .colorFormatCount = narrow_cast<uint32_t>(formats.size()),
+        .sampleCount = m_desc.sample_count,
+        .compilationPolicy = static_cast<rhi::PipelineCompilationPolicy>(m_desc.compilation_policy),
+        .label = m_desc.label.empty() ? nullptr : m_desc.label.c_str(),
+    };
+    SLANG_RHI_CALL(
+        m_device->rhi_device()->createTilePipeline(rhi_desc, (rhi::ITilePipeline**)m_rhi_pipeline.writeRef()),
+        m_device
+    );
+    m_thread_group_size = m_desc.program->layout()->get_entry_point_by_index(0)->compute_thread_group_size();
+}
+
+NativeHandle TilePipeline::native_handle() const
+{
+    rhi::NativeHandle rhi_handle = {};
+    m_rhi_pipeline->getNativeHandle(&rhi_handle);
+    return NativeHandle(rhi_handle);
+}
+
+std::string TilePipeline::to_string() const
+{
+    return fmt::format(
+        "TilePipeline(\n"
+        "  device = {},\n"
+        "  program = {},\n"
+        "  label = {},\n"
+        "  thread_group_size = {}\n"
+        ")",
+        m_device,
+        m_desc.program,
+        m_desc.label,
+        m_thread_group_size
+    );
+}
+
+// ----------------------------------------------------------------------------
 // RayTracingPipeline
 // ----------------------------------------------------------------------------
 

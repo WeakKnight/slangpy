@@ -50,6 +50,13 @@ struct RenderPassDepthStencilAttachment {
 struct RenderPassDesc {
     std::vector<RenderPassColorAttachment> color_attachments;
     std::optional<RenderPassDepthStencilAttachment> depth_stencil_attachment;
+    /// Tile width in pixels, or 0 to let the backend choose. Requires ``Feature::tile_shading`` if nonzero.
+    uint32_t tile_width{0};
+    /// Tile height in pixels, or 0 to let the backend choose. Requires ``Feature::tile_shading`` if nonzero.
+    uint32_t tile_height{0};
+    /// Sizes in bytes of the tile memory slots, indexed by the ``N`` of the shader's ``SV_MetalThreadgroupN``
+    /// semantic. Each size must be a multiple of 16. Requires ``Feature::tile_shading``.
+    std::vector<uint32_t> tile_memory_sizes;
 };
 
 using ExecuteCallbackContext = rhi::ExecuteCallbackContext;
@@ -110,6 +117,11 @@ public:
     ShaderObject* bind_pipeline(RenderPipeline* pipeline);
     void bind_pipeline(RenderPipeline* pipeline, ShaderObject* root_object);
 
+    /// Bind a tile pipeline for subsequent ``dispatch_tile`` calls and return its root object.
+    /// The tile pipeline is bound independently of the render pipeline used by draws.
+    ShaderObject* bind_pipeline(TilePipeline* pipeline);
+    void bind_pipeline(TilePipeline* pipeline, ShaderObject* root_object);
+
     void set_render_state(const RenderState& state);
 
     void draw(const DrawArguments& args);
@@ -121,6 +133,10 @@ public:
     draw_indexed_indirect(uint32_t max_draw_count, BufferOffsetPair arg_buffer, BufferOffsetPair count_buffer = {});
 
     void draw_mesh_tasks(uint3 dimensions);
+
+    /// Dispatch the bound tile pipeline once on every tile of the render pass, with one thread group of the
+    /// entry point's ``numthreads`` size per tile.
+    void dispatch_tile();
 
     void end() override;
 

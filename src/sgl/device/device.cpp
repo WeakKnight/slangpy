@@ -949,6 +949,11 @@ ref<RenderPipeline> Device::create_render_pipeline(RenderPipelineDesc desc)
     return make_ref<RenderPipeline>(ref<Device>(this), std::move(desc));
 }
 
+ref<TilePipeline> Device::create_tile_pipeline(TilePipelineDesc desc)
+{
+    return make_ref<TilePipeline>(ref<Device>(this), std::move(desc));
+}
+
 ref<RayTracingPipeline> Device::create_ray_tracing_pipeline(RayTracingPipelineDesc desc)
 {
     return make_ref<RayTracingPipeline>(ref<Device>(this), std::move(desc));

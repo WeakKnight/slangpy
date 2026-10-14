@@ -517,7 +517,11 @@ Texture::Texture(ref<Device> device, TextureDesc desc)
     rhi_desc.sampler = m_desc.sampler ? m_desc.sampler->rhi_sampler() : nullptr;
     rhi_desc.label = m_desc.label.empty() ? nullptr : m_desc.label.c_str();
 
-    if (m_desc.memory_type == MemoryType::device_local)
+    // Device-local textures implicitly support copies for uploads and readback, except for
+    // transient attachments, whose contents never leave a render pass.
+    bool is_transient = is_set(m_desc.usage, TextureUsage::transient_attachment);
+    SGL_CHECK(!is_transient || m_desc.data.empty(), "Transient attachments cannot have initial data.");
+    if (m_desc.memory_type == MemoryType::device_local && !is_transient)
         rhi_desc.usage |= rhi::TextureUsage::CopySource | rhi::TextureUsage::CopyDestination;
 
     SLANG_RHI_CALL(m_device->rhi_device()->createTexture(rhi_desc, nullptr, m_rhi_texture.writeRef()), m_device);

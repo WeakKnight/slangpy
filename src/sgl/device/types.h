@@ -123,6 +123,7 @@ enum class Feature : uint32_t {
     // Metal specific features
     argument_buffer_tier2 = static_cast<uint32_t>(rhi::Feature::ArgumentBufferTier2),
     residency_set = static_cast<uint32_t>(rhi::Feature::ResidencySet),
+    tile_shading = static_cast<uint32_t>(rhi::Feature::TileShading),
     // CUDA specific features
     atomic_bfloat16 = static_cast<uint32_t>(rhi::Feature::AtomicBfloat16),
 
@@ -206,6 +207,7 @@ SGL_ENUM_INFO(
         {Feature::cooperative_matrix_block_loads, "cooperative_matrix_block_loads"},
         {Feature::argument_buffer_tier2, "argument_buffer_tier2"},
         {Feature::residency_set, "residency_set"},
+        {Feature::tile_shading, "tile_shading"},
         {Feature::atomic_bfloat16, "atomic_bfloat16"},
     }
 );
@@ -278,6 +280,7 @@ enum class ShaderStage : uint32_t {
     callable = SLANG_STAGE_CALLABLE,
     mesh = SLANG_STAGE_MESH,
     amplification = SLANG_STAGE_AMPLIFICATION,
+    tile = SLANG_STAGE_TILE,
 };
 
 SGL_ENUM_INFO(
@@ -298,6 +301,7 @@ SGL_ENUM_INFO(
         {ShaderStage::callable, "callable"},
         {ShaderStage::mesh, "mesh"},
         {ShaderStage::amplification, "amplification"},
+        {ShaderStage::tile, "tile"},
     }
 );
 SGL_ENUM_REGISTER(ShaderStage);

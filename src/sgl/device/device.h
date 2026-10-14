@@ -631,6 +631,9 @@ public:
     /// Create a render pipeline.
     ref<RenderPipeline> create_render_pipeline(RenderPipelineDesc desc);
 
+    /// Create a tile pipeline. Requires ``Feature::tile_shading``.
+    ref<TilePipeline> create_tile_pipeline(TilePipelineDesc desc);
+
     /// Create a ray tracing pipeline.
     ref<RayTracingPipeline> create_ray_tracing_pipeline(RayTracingPipelineDesc desc);
 

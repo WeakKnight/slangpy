@@ -67,6 +67,7 @@ DESCRIPTOR_CONVERT_TYPES = {
     "TextureDesc": True,
     "TextureLoader.Options": True,
     "TextureViewDesc": True,
+    "TilePipelineDesc": True,
     "VertexStreamDesc": True,
     "Viewport": True,
 }

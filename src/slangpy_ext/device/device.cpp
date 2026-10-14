@@ -1264,6 +1264,32 @@ SGL_PY_EXPORT(device_device)
     device.def("create_render_pipeline", &Device::create_render_pipeline, "desc"_a, D(Device, create_render_pipeline));
 
     device.def(
+        "create_tile_pipeline",
+        [](Device* self,
+           ref<ShaderProgram> program,
+           std::vector<Format> color_formats,
+           uint32_t sample_count,
+           PipelineCompilationPolicy compilation_policy,
+           std::optional<std::string> label)
+        {
+            return self->create_tile_pipeline({
+                .program = std::move(program),
+                .color_formats = std::move(color_formats),
+                .sample_count = sample_count,
+                .compilation_policy = compilation_policy,
+                .label = label.value_or(""),
+            });
+        },
+        "program"_a,
+        "color_formats"_a,
+        "sample_count"_a = TilePipelineDesc().sample_count,
+        "compilation_policy"_a = TilePipelineDesc().compilation_policy,
+        "label"_a.none() = nb::none(),
+        D(Device, create_tile_pipeline)
+    );
+    device.def("create_tile_pipeline", &Device::create_tile_pipeline, "desc"_a, D(Device, create_tile_pipeline));
+
+    device.def(
         "create_ray_tracing_pipeline",
         [](Device* self,
            ref<ShaderProgram> program,

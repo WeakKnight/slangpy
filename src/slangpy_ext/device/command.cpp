@@ -42,6 +42,9 @@ SGL_DICT_TO_DESC_END()
 SGL_DICT_TO_DESC_BEGIN(RenderPassDesc)
 SGL_DICT_TO_DESC_FIELD_LIST(color_attachments, RenderPassColorAttachment)
 SGL_DICT_TO_DESC_FIELD(depth_stencil_attachment, RenderPassDepthStencilAttachment)
+SGL_DICT_TO_DESC_FIELD(tile_width, uint32_t)
+SGL_DICT_TO_DESC_FIELD(tile_height, uint32_t)
+SGL_DICT_TO_DESC_FIELD(tile_memory_sizes, std::vector<uint32_t>)
 SGL_DICT_TO_DESC_END()
 
 // From resource.cpp
@@ -264,7 +267,10 @@ SGL_PY_EXPORT(device_command)
             "depth_stencil_attachment",
             &RenderPassDesc::depth_stencil_attachment,
             D(RenderPassDesc, depth_stencil_attachment)
-        );
+        )
+        .def_rw("tile_width", &RenderPassDesc::tile_width, D(RenderPassDesc, tile_width))
+        .def_rw("tile_height", &RenderPassDesc::tile_height, D(RenderPassDesc, tile_height))
+        .def_rw("tile_memory_sizes", &RenderPassDesc::tile_memory_sizes, D(RenderPassDesc, tile_memory_sizes));
     nb::implicitly_convertible<nb::dict, RenderPassDesc>();
 
     nb::class_<CommandEncoder, DeviceChild>(m, "CommandEncoder", D(CommandEncoder))
@@ -638,6 +644,19 @@ SGL_PY_EXPORT(device_command)
             D(RenderPassEncoder, bind_pipeline, 2)
         )
         .def(
+            "bind_pipeline",
+            nb::overload_cast<TilePipeline*>(&RenderPassEncoder::bind_pipeline),
+            "pipeline"_a,
+            D(RenderPassEncoder, bind_pipeline, 3)
+        )
+        .def(
+            "bind_pipeline",
+            nb::overload_cast<TilePipeline*, ShaderObject*>(&RenderPassEncoder::bind_pipeline),
+            "pipeline"_a,
+            "root_object"_a,
+            D(RenderPassEncoder, bind_pipeline, 4)
+        )
+        .def(
             "set_render_state",
             &RenderPassEncoder::set_render_state,
             "state"_a,
@@ -666,7 +685,8 @@ SGL_PY_EXPORT(device_command)
             &RenderPassEncoder::draw_mesh_tasks,
             "dimensions"_a,
             D(RenderPassEncoder, draw_mesh_tasks)
-        );
+        )
+        .def("dispatch_tile", &RenderPassEncoder::dispatch_tile, D(RenderPassEncoder, dispatch_tile));
 
 
     nb::class_<ComputePassEncoder, PassEncoder>(m, "ComputePassEncoder", D(ComputePassEncoder))

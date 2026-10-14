@@ -25,6 +25,14 @@ SGL_DICT_TO_DESC_FIELD(compilation_policy, PipelineCompilationPolicy)
 SGL_DICT_TO_DESC_FIELD(label, std::string)
 SGL_DICT_TO_DESC_END()
 
+SGL_DICT_TO_DESC_BEGIN(TilePipelineDesc)
+SGL_DICT_TO_DESC_FIELD(program, ref<ShaderProgram>)
+SGL_DICT_TO_DESC_FIELD(color_formats, std::vector<Format>)
+SGL_DICT_TO_DESC_FIELD(sample_count, uint32_t)
+SGL_DICT_TO_DESC_FIELD(compilation_policy, PipelineCompilationPolicy)
+SGL_DICT_TO_DESC_FIELD(label, std::string)
+SGL_DICT_TO_DESC_END()
+
 SGL_DICT_TO_DESC_BEGIN(HitGroupDesc)
 SGL_DICT_TO_DESC_FIELD(hit_group_name, std::string)
 SGL_DICT_TO_DESC_FIELD(closest_hit_entry_point, std::string)
@@ -95,6 +103,26 @@ SGL_PY_EXPORT(device_pipeline)
 
     nb::class_<RenderPipeline, Pipeline>(m, "RenderPipeline", D(RenderPipeline)) //
         .def_prop_ro("native_handle", &RenderPipeline::native_handle, D(RenderPipeline, native_handle));
+
+    nb::class_<TilePipelineDesc>(m, "TilePipelineDesc", D(TilePipelineDesc))
+        .def(nb::init<>())
+        .def(
+            "__init__",
+            [](TilePipelineDesc* self, nb::dict dict)
+            {
+                new (self) TilePipelineDesc(dict_to_TilePipelineDesc(dict));
+            }
+        )
+        .def_rw("program", &TilePipelineDesc::program, D(TilePipelineDesc, program))
+        .def_rw("color_formats", &TilePipelineDesc::color_formats, D(TilePipelineDesc, color_formats))
+        .def_rw("sample_count", &TilePipelineDesc::sample_count, D(TilePipelineDesc, sample_count))
+        .def_rw("compilation_policy", &TilePipelineDesc::compilation_policy)
+        .def_rw("label", &TilePipelineDesc::label, D(TilePipelineDesc, label));
+    nb::implicitly_convertible<nb::dict, TilePipelineDesc>();
+
+    nb::class_<TilePipeline, Pipeline>(m, "TilePipeline", D(TilePipeline))
+        .def_prop_ro("thread_group_size", &TilePipeline::thread_group_size, D(TilePipeline, thread_group_size))
+        .def_prop_ro("native_handle", &TilePipeline::native_handle, D(TilePipeline, native_handle));
 
     nb::class_<HitGroupDesc>(m, "HitGroupDesc", D(HitGroupDesc))
         .def(nb::init<>())

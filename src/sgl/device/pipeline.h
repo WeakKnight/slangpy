@@ -133,6 +133,48 @@ private:
     Slang::ComPtr<rhi::IRenderPipeline> m_rhi_pipeline;
 };
 
+struct TilePipelineDesc {
+    /// Program with exactly one tile entry point.
+    ref<ShaderProgram> program;
+    /// Formats of the render pass color attachments the pipeline is used with.
+    std::vector<Format> color_formats;
+    /// Sample count of the render pass attachments the pipeline is used with.
+    uint32_t sample_count{1};
+    PipelineCompilationPolicy compilation_policy{PipelineCompilationPolicy::default_};
+    std::string label;
+};
+
+/// Tile pipeline.
+/// Runs a tile shader entry point on every tile of a render pass, between draws.
+/// Requires ``Feature::tile_shading``.
+class SGL_API TilePipeline : public Pipeline {
+public:
+    TilePipeline(ref<Device> device, TilePipelineDesc desc);
+
+    virtual void _release_rhi_resources() override { m_rhi_pipeline.setNull(); }
+
+    const TilePipelineDesc& desc() const { return m_desc; }
+
+    /// Thread group size.
+    /// One thread group of this size is dispatched per tile.
+    uint3 thread_group_size() const { return m_thread_group_size; }
+
+    /// Get the native pipeline handle.
+    NativeHandle native_handle() const;
+
+    rhi::ITilePipeline* rhi_pipeline() const { return m_rhi_pipeline; }
+
+    std::string to_string() const override;
+
+protected:
+    virtual void recreate() override;
+
+private:
+    TilePipelineDesc m_desc;
+    uint3 m_thread_group_size;
+    Slang::ComPtr<rhi::ITilePipeline> m_rhi_pipeline;
+};
+
 struct HitGroupDesc {
     std::string hit_group_name;
     std::string closest_hit_entry_point;
